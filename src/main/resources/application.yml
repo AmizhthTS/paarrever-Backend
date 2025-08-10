@@ -1,0 +1,96 @@
+server:
+  port: 80
+  servlet:
+    context-path: /cmarf
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,logfile
+  endpoint:
+    logfile:
+      enabled: true
+      external-file: /opt/cmarf/apache-tomcat-10.1.42/logs/catalina.out
+    health:
+      show-details: always
+      show-components: always
+
+spring:
+  freemarker:
+    check-template-location: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: cmarfqa
+    #username: postgres
+    password: Cmarf#2025
+    url: jdbc:postgresql://cmarfqa.cn6228qgyatu.ap-south-1.rds.amazonaws.com:5432/postgres?currentSchema=public
+    #url: jdbc:postgresql://cmarf.crwmo2se0f1m.ap-south-1.rds.amazonaws.com:5432/postgres?currentSchema=public
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+    open-in-view: false
+    properties:
+      jakarta:
+        persistence:
+          sharedCache:
+            mode: ALL
+  mail:
+   host: smtp.gmail.com
+   port: 587
+   username: amizhthdev31@gmail.com
+   password: wglokkzxzncwgpvv
+   errorReceipients: praba@amizhth.com
+   cc:
+   properties:
+    mail:
+     smtp:
+      auth: true
+      starttls:
+       enable: true
+  http:
+    multipart: 
+      enabled: true
+  sql:
+    init:
+      platform: postgres
+      mode: always
+      continue-on-error: false
+
+MaxFileSizeInMB: 2
+FilePath: /opt/cmarf/files/
+ThymeleafFilePath: ~/opt/cmarf/files/
+OTPValidatityInSeconds: 60
+TamilNaduLogo: /opt/cmarf/TamilNadu-Logo.jpg
+TamilNaduLogoTransparent: /opt/cmarf/tnlogo.png
+  
+logging:
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+    file: "%d %-5level [%thread] %logger : %msg%n"
+
+bank:
+  account:
+    number: "8086364674"
+    ifsc: "IDIB000S002"
+    name: "CHIEF MINISTERS ACCIDENT RELIEF FUND"
+  api:
+    base-url: "https://testapigateway.indianbank.in:8443/preprod-indianbank/open-api/payment/v1/"
+    token-url: "token"
+    payment-url: "submit"
+  tokenapi:  
+    scope: "payment"
+    grantType: "client_credentials"
+    clientId: "ae83a395d40675e92b2aa311397b0d5d"
+    client_secret: "1985841e5578fd07cae78609f1d4bbb6"
+  paymentapi:
+    client-certificate: "MIIDyzCCArOgAwIBAgIUI3abkhhAX95rkEiaBbt2UjlBDicwDQYJKoZIhvcNAQELBQAwgY0xCzAJBgNVBAYTAklOMQswCQYDVQQIDAJUTjEQMA4GA1UEBwwHQ2hlbm5haTEQMA4GA1UECgwHQW1pemh0aDEMMAoGA1UECwwDREVWMRgwFgYDVQQDDA9DTUFSRi1ERVYtUFJBQkExJTAjBgkqhkiG9w0BCQEWFnByYWJhaGFyLmNzZUBnbWFpbC5jb20wHhcNMjUwNzEzMDM1MjQ4WhcNMjYwNzEzMDM1MjQ4WjCBjTELMAkGA1UEBhMCSU4xCzAJBgNVBAgMAlROMRAwDgYDVQQHDAdDaGVubmFpMRAwDgYDVQQKDAdBbWl6aHRoMQwwCgYDVQQLDANERVYxGDAWBgNVBAMMD0NNQVJGLURFVi1QUkFCQTElMCMGCSqGSIb3DQEJARYWcHJhYmFoYXIuY3NlQGdtYWlsLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOk3sERZ7XAyy7mGN4xhFllxyllgbizHnydlSQS"  
+thirdparty:
+   nic-edar:
+     base-url: "https://gisnic.tn.nic.in/edarapi"
+     username: "y/cgcf8iEnZNYhzWKVL1Dg=="
+     password: "n+GQSgkqGPA9EfDQ+4FBzg=="
