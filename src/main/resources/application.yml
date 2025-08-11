@@ -1,7 +1,7 @@
 server:
   port: 80
   servlet:
-    context-path: /cmarf
+    context-path: /paarr
 
 management:
   endpoints:
@@ -26,6 +26,8 @@ spring:
     password: Cmarf#2025
     url: jdbc:postgresql://cmarfqa.cn6228qgyatu.ap-south-1.rds.amazonaws.com:5432/postgres?currentSchema=public
     #url: jdbc:postgresql://cmarf.crwmo2se0f1m.ap-south-1.rds.amazonaws.com:5432/postgres?currentSchema=public
+  
+
   jpa:
     generate-ddl: true
     hibernate:

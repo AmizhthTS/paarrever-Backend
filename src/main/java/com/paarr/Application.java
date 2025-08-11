@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan({ "com.paarr.*" })
-@EntityScan(basePackages = { "com.paarr.entitymodel" })
+@EntityScan(basePackages = { "com.paarr.entity" })
 public class Application extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
