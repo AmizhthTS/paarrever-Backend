@@ -12,6 +12,7 @@ import com.paarr.service.SubCategoryService;
 
 	@RestController
 	@RequestMapping(value = "/subcategory")
+	@CrossOrigin(origins = "*")
 	public class SubCategoryController {
 
 	    @Autowired
@@ -22,7 +23,7 @@ import com.paarr.service.SubCategoryService;
 	        ResponseDTO response = subCategoryService.save(subCategoryDTO);
 	        return new ResponseEntity<ResponseDTO>(response, HttpStatus.CREATED);
 	    }
-
+ 
 	    @PostMapping(value = "/list", produces = { MediaType.APPLICATION_JSON_VALUE })
 	    public ResponseEntity<SubCategoryPageDTO> list(@RequestBody SubCategoryPageDTO subCategoryPageDTO) {
 	        subCategoryPageDTO = subCategoryService.list(subCategoryPageDTO);

@@ -6,9 +6,17 @@ import com.paarr.dto.ResponseDTO;
 import java.util.List;
 
 public interface StoreService {
-    ResponseDTO save(StoreDTO storeDTO);
-    StorePageDTO list(StorePageDTO storePageDTO);
-    StoreDTO get(long id);
-    ResponseDTO delete(long id);
-    List<StoreDTO> getByAreaName(String areaName);
+//    ResponseDTO save(StoreDTO storeDTO);
+//    StorePageDTO list(StorePageDTO storePageDTO);
+//    StoreDTO get(long id);
+//    ResponseDTO delete(long id);
+//    List<StoreDTO> getByAreaName(String areaName);
+	
+	    ResponseDTO save(StoreDTO storeDTO);
+	    StorePageDTO list(StorePageDTO storePageDTO);
+	    StoreDTO get(long id);
+	    ResponseDTO delete(long id);
+	    List<StoreDTO> getByMainArea(String mainArea);
+	    List<StoreDTO> getBySubArea(String subArea);
+	
 }

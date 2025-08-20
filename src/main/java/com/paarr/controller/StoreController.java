@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/store")
+@CrossOrigin(origins = "*")
 public class StoreController {
 
     @Autowired
@@ -40,9 +41,30 @@ public class StoreController {
         return new ResponseEntity<ResponseDTO>(responseDTO, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/get-by-area")
-    public ResponseEntity<List<StoreDTO>> getByArea(@RequestParam String areaName) {
-        List<StoreDTO> stores = storeService.getByAreaName(areaName);
-        return new ResponseEntity<List<StoreDTO>>(stores, HttpStatus.OK);
+//    @GetMapping(value = "/get-by-area")
+//    public ResponseEntity<List<StoreDTO>> getByArea(@RequestParam String areaName) {
+//        List<StoreDTO> stores = storeService.getByAreaName(areaName);
+//        return new ResponseEntity<List<StoreDTO>>(stores, HttpStatus.OK);
+//    }
+    @GetMapping(value = "/get-by-main-area")
+    public ResponseEntity<ResponseDTO> getByMainArea(@RequestParam String mainArea) {
+        List<StoreDTO> stores = storeService.getByMainArea(mainArea);
+        ResponseDTO response = new ResponseDTO();
+        response.setResponseStatus("Success");
+
+        if (stores.isEmpty()) {
+            response.setResponseMessage("No stores found in " + mainArea);
+            response.setResponse(stores); // empty []
+        } else {
+            response.setResponseMessage("Stores fetched");
+            response.setResponse(stores); // store list here
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/get-by-sub-area")
+    public ResponseEntity<List<StoreDTO>> getBySubArea(@RequestParam String subArea) {
+        List<StoreDTO> stores = storeService.getBySubArea(subArea);
+        return new ResponseEntity<>(stores, HttpStatus.OK);
     }
 }

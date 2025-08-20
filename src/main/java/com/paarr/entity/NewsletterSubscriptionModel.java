@@ -18,6 +18,7 @@ public class NewsletterSubscriptionModel {
 
     @Column(nullable = false, unique = true)
     private String email;
-
+  
     private Boolean active;
+    
 }

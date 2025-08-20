@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/contact")
+@CrossOrigin(origins = "*")
 public class ContactController {
 	
 	
@@ -16,8 +17,8 @@ public class ContactController {
 	    private ContactMessageServiceImpl contactMessageServiceImplservice;
 
 	    @PostMapping
-	    public ResponseEntity<String> saveMessage(@RequestBody ContactMessageDTO dto) {
-	        String result = contactMessageServiceImplservice.saveMessage(dto);
+	    public ResponseEntity<String> saveMessage(@RequestBody ContactMessageDTO contactMessageDTO) {
+	        String result = contactMessageServiceImplservice.saveMessage(contactMessageDTO);
 	        return ResponseEntity.ok(result);
 	    }
 	

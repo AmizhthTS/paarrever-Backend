@@ -1,23 +1,20 @@
 package com.paarr.service.implementation;
-
-import com.paarr.dto.*;
-import com.paarr.entity.StoreModel;
-import com.paarr.repository.StoreRepository;
-import com.paarr.service.StoreService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import com.paarr.dto.*; 
+import com.paarr.entity.StoreModel; 
+import com.paarr.repository.StoreRepository; 
+import com.paarr.service.StoreService; 
+import org.springframework.beans.factory.annotation.Autowired; 
+import org.springframework.data.domain.*; 
+import org.springframework.stereotype.Service; 
+import java.util.List; 
 import java.util.stream.Collectors;
-
 @Service
 public class StoreServiceImpl implements StoreService {
 
     @Autowired
     StoreRepository storeRepository;
 
-    
+    @Override
     public ResponseDTO save(StoreDTO storeDTO) {
         StoreModel storeModel = null;
 
@@ -31,10 +28,14 @@ public class StoreServiceImpl implements StoreService {
             storeModel.setActive(true);
         }
 
+        // Map fields
         storeModel.setStoreName(storeDTO.getStoreName());
         storeModel.setAddress(storeDTO.getAddress());
-        storeModel.setAreaName(storeDTO.getAreaName());
+        storeModel.setMainArea(storeDTO.getMainArea());
+        storeModel.setSubArea(storeDTO.getSubArea());
         storeModel.setContactNumber(storeDTO.getContactNumber());
+        storeModel.setOpeningTime(storeDTO.getOpeningTime());
+        storeModel.setClosingTime(storeDTO.getClosingTime());
 
         storeRepository.save(storeModel);
 
@@ -45,7 +46,7 @@ public class StoreServiceImpl implements StoreService {
         return response;
     }
 
-    
+    @Override
     public StorePageDTO list(StorePageDTO storePageDTO) {
         Pageable paging = PageRequest.of(
             Math.max(storePageDTO.getPageNumber() - 1, 0),
@@ -74,14 +75,14 @@ public class StoreServiceImpl implements StoreService {
         return storePageDTO;
     }
 
-   
+    @Override
     public StoreDTO get(long id) {
         StoreModel storeModel = storeRepository.findByIdAndActive(id, true);
         if (storeModel == null) throw new RuntimeException("Store not found");
         return mapToDTO(storeModel);
     }
 
-   
+    @Override
     public ResponseDTO delete(long id) {
         StoreModel storeModel = storeRepository.findByIdAndActive(id, true);
         if (storeModel == null) throw new RuntimeException("Store not found");
@@ -95,9 +96,15 @@ public class StoreServiceImpl implements StoreService {
         return response;
     }
 
-    
-    public List<StoreDTO> getByAreaName(String areaName) {
-        return storeRepository.findByAreaNameContainsIgnoreCaseAndActive(areaName, true, Pageable.unpaged())
+    @Override
+    public List<StoreDTO> getByMainArea(String mainArea) {
+        return storeRepository.findByMainAreaContainsIgnoreCaseAndActive(mainArea, true, Pageable.unpaged())
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StoreDTO> getBySubArea(String subArea) {
+        return storeRepository.findBySubAreaContainsIgnoreCaseAndActive(subArea, true, Pageable.unpaged())
                 .stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
@@ -106,8 +113,11 @@ public class StoreServiceImpl implements StoreService {
         storeDTO.setId(model.getId());
         storeDTO.setStoreName(model.getStoreName());
         storeDTO.setAddress(model.getAddress());
-        storeDTO.setAreaName(model.getAreaName());
+        storeDTO.setMainArea(model.getMainArea());
+        storeDTO.setSubArea(model.getSubArea());
         storeDTO.setContactNumber(model.getContactNumber());
+        storeDTO.setOpeningTime(model.getOpeningTime());
+        storeDTO.setClosingTime(model.getClosingTime());
         return storeDTO;
     }
 }

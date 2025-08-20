@@ -8,7 +8,8 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/category/subscribe") 
+@RequestMapping("/newsletter/subscribe") 
+@CrossOrigin(origins = "*")
 public class NewsletterSubscriptionController {
 
     @Autowired

@@ -1,14 +1,41 @@
 package com.paarr.service.implementation;
 
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.data.domain.*;
+//import org.springframework.stereotype.Service;
+//import org.springframework.web.multipart.MultipartFile;
+//
+//import com.amazonaws.services.s3.model.PutObjectRequest;
+//import com.paarr.dto.*;
+//import com.paarr.entity.CategoryModel;
+//import com.paarr.repository.CategoryRepository;
+//import com.paarr.service.CategoryService;
+//
+//import io.jsonwebtoken.io.IOException;
+//
+//import java.util.List;
+//import java.util.UUID;
+//import java.util.stream.Collectors;
+//package com.paarr.service.implementation;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.paarr.dto.*;
 import com.paarr.entity.CategoryModel;
 import com.paarr.repository.CategoryRepository;
 import com.paarr.service.CategoryService;
 
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.core.sync.RequestBody;
+
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +43,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     CategoryRepository categoryRepository;
+    
+    @Autowired
+    private S3Client s3Client;
+
+    private final String BUCKET = "paarr-dev-doc";// change to your S3 bucket
+    private static final String REGION = "ap-south-1";
 
     public ResponseDTO save(CategoryDTO categoryDTO) {
         CategoryModel categoryModel = null;
@@ -34,7 +67,17 @@ public class CategoryServiceImpl implements CategoryService {
 
         categoryModel.setCategoryName(categoryDTO.getCategoryName());
         categoryModel.setDescription(categoryDTO.getDescription());
-        categoryModel.setImageurl(categoryDTO.getImageurl()); // <-- store image URL
+        
+        // Handle image upload
+        MultipartFile imageFile = categoryDTO.getImageFile();
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageUrl = uploadToS3(imageFile);
+            categoryModel.setImageurl(imageUrl);
+        } else if (categoryDTO.getImageUrl() != null) {
+            // Keep existing URL if provided
+            categoryModel.setImageurl(categoryDTO.getImageUrl());
+        }
+        //categoryModel.setImageurl(categoryDTO.getImageurl()); // <-- store image URL
 
         categoryRepository.save(categoryModel);
 
@@ -43,6 +86,7 @@ public class CategoryServiceImpl implements CategoryService {
         responseDTO.setResponseMessage(categoryDTO.getId() != null && categoryDTO.getId() > 0
                 ? "Updated Successfully"
                 : "Saved Successfully");
+        responseDTO.setResponse(categoryModel);
 
         return responseDTO;
     }
@@ -112,7 +156,28 @@ public class CategoryServiceImpl implements CategoryService {
         categoryDTO.setId(categoryModel.getId());
         categoryDTO.setCategoryName(categoryModel.getCategoryName());
         categoryDTO.setDescription(categoryModel.getDescription());
-        categoryDTO.setImageurl(categoryModel.getImageurl()); // <-- map image URL
+        categoryDTO.setImageUrl(categoryModel.getImageurl()); // <-- map image URL
         return categoryDTO;
+    }
+    private String uploadToS3(MultipartFile file) {
+        try {
+            String key = "category/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+            PutObjectRequest putOb = PutObjectRequest.builder()
+                    .bucket(BUCKET)
+                    .key(key)
+                    //.acl("public-read")
+                    //.acl(ObjectCannedACL.PUBLIC_READ)
+                    .contentType(file.getContentType())
+                    .build();
+
+            s3Client.putObject(putOb, software.amazon.awssdk.core.sync.RequestBody.fromBytes(file.getBytes()));
+
+            //return "https://" + BUCKET + ".s3.amazonaws.com/" + key;
+            return "https://" + BUCKET + ".s3." + REGION + ".amazonaws.com/" + key;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error uploading file to S3", e);
+        }
     }
 }
