@@ -19,165 +19,199 @@ package com.paarr.service.implementation;
 //package com.paarr.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.paarr.dto.*;
 import com.paarr.entity.CategoryModel;
+import com.paarr.exception.EcosystemException;
+import com.paarr.exception.ErrorEnum;
 import com.paarr.repository.CategoryRepository;
 import com.paarr.service.CategoryService;
 
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.core.sync.RequestBody;
-
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.paarr.util.AWSUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    CategoryRepository categoryRepository;
-    
-    @Autowired
-    private S3Client s3Client;
+	@Autowired
+	CategoryRepository categoryRepository;
 
-    private final String BUCKET = "paarr-dev-doc";// change to your S3 bucket
-    private static final String REGION = "ap-south-1";
+	@Autowired
+	private AWSUtil awsUtil;
 
-    public ResponseDTO save(CategoryDTO categoryDTO) {
-        CategoryModel categoryModel = null;
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-        if (categoryDTO.getId() != null && categoryDTO.getId() > 0) {
-        	categoryModel = categoryRepository.findByIdAndActive(categoryDTO.getId(), true);
-            if (categoryModel == null) {
-                throw new RuntimeException("Category not found");
-            }
-        }
+//    @Autowired
+//    private S3Client s3Client;
 
-        if (categoryModel == null) {
-        	categoryModel = new CategoryModel();
-        	categoryModel.setActive(true);
-        }
+//    private final String BUCKET = "paarr-dev-doc";// change to your S3 bucket
+//    private static final String REGION = "ap-south-1";
 
-        categoryModel.setCategoryName(categoryDTO.getCategoryName());
-        categoryModel.setDescription(categoryDTO.getDescription());
-        
-        // Handle image upload
-        MultipartFile imageFile = categoryDTO.getImageFile();
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageUrl = uploadToS3(imageFile);
-            categoryModel.setImageurl(imageUrl);
-        } else if (categoryDTO.getImageUrl() != null) {
-            // Keep existing URL if provided
-            categoryModel.setImageurl(categoryDTO.getImageUrl());
-        }
-        //categoryModel.setImageurl(categoryDTO.getImageurl()); // <-- store image URL
+	public ResponseDTO save(CategoryDTO categoryDTO) {
+		CategoryModel categoryModel = null;
+		String image = null;
 
-        categoryRepository.save(categoryModel);
+		if (categoryDTO.getImage() != null && categoryDTO.getImage().length > 0) {
 
-        ResponseDTO responseDTO = new ResponseDTO();
-        responseDTO.setResponseStatus("Success");
-        responseDTO.setResponseMessage(categoryDTO.getId() != null && categoryDTO.getId() > 0
-                ? "Updated Successfully"
-                : "Saved Successfully");
-        responseDTO.setResponse(categoryModel);
+			if (!Arrays.equals(categoryDTO.getImage(), "something".getBytes())) {
+				ByteArrayInputStream targetStream = new ByteArrayInputStream(categoryDTO.getImage());
 
-        return responseDTO;
-    }
+				try {
+					if (!awsUtil.checkFileSize(targetStream))
+						throw new EcosystemException(ErrorEnum.INVALID_FILE_SIZE);
+				} catch (Exception e) {
+					throw new EcosystemException(ErrorEnum.INVALID_FILE_SIZE);
+				}
 
-    public CategoryPageDTO list(CategoryPageDTO categoryPageDTO) {
-        Pageable paging = PageRequest.of(
-        		categoryPageDTO.getPageNumber() > 0 ? categoryPageDTO.getPageNumber() - 1 : 0,
-        				categoryPageDTO.getListSize() > 0 ? categoryPageDTO.getListSize() : 25,
-                Sort.by("categoryName").ascending()
-        );
+				if (categoryDTO.getImageName().isEmpty() || !categoryDTO.getImageName().contains("."))
+					throw new EcosystemException(ErrorEnum.INVALID_FILE_NAME);
 
-        Page<CategoryModel> page;
-        if (categoryPageDTO.getSearchString() != null && !categoryPageDTO.getSearchString().isEmpty()) {
-            page = categoryRepository.findByCategoryNameContainsIgnoreCaseAndActive(categoryPageDTO.getSearchString(), true, paging);
-        } else {
-            page = categoryRepository.findByActive(true, paging);
-        }
+				String fullFileName = categoryDTO.getImageName();
+				String[] fileArray = fullFileName.split("[.]");
+				String fileName = fileArray[0];
+				String fileFormat = fileArray[1];
+				try {
+					image = awsUtil.saveFile(targetStream, fileName, fileFormat, "category");
+				} catch (Exception e) {
+					throw new EcosystemException(ErrorEnum.FILE_UPLOAD_FAILED);
+				}
 
-        List<CategoryDTO> categoryDTOList = page.stream()
-                .map(this::constructResponse)
-                .collect(Collectors.toList());
+				if (image.isEmpty()) {
+					throw new EcosystemException(ErrorEnum.FILE_UPLOAD_FAILED);
+				} else {
+					if (categoryDTO.getId() != null) {
+						CategoryModel existingCategory = categoryRepository.findById(categoryDTO.getId()).orElse(null);
+						if (existingCategory != null && existingCategory.getImage() != null
+								&& !existingCategory.getImage().isEmpty()) {
+							try {
+								awsUtil.copyAndTrashBucketObject(existingCategory.getImage(),
+										existingCategory.getImage(), "category");
+							} catch (Exception e) {
+								logger.warn("File Not Found to remove from AWS :: " + existingCategory.getImage());
+							}
+						}
+					}
+				}
+			} else {
+				if (categoryDTO.getId() != null) {
+					CategoryModel existingCategory = categoryRepository.findById(categoryDTO.getId()).orElse(null);
+					if (existingCategory != null) {
+						image = existingCategory.getImage();
+					}
+				}
+			}
+		}
 
-        categoryPageDTO.setCategories(categoryDTOList);
-        categoryPageDTO.setCount(page.getTotalElements());
-        categoryPageDTO.setTotalPages(page.getTotalPages());
+		// Save or update category
+		if (categoryDTO.getId() != null && categoryDTO.getId() > 0) {
+			categoryModel = categoryRepository.findById(categoryDTO.getId()).orElse(new CategoryModel());
+		} else {
+			categoryModel = new CategoryModel();
+			categoryModel.setActive(true); 
+			
+		}
 
-        ResponseDTO responseDTO = new ResponseDTO();
-        responseDTO.setResponseStatus("Success");
-        responseDTO.setResponseMessage("List Fetched");
-        categoryPageDTO.setResponse(responseDTO);
+		categoryModel.setCategoryName(categoryDTO.getCategoryName());
+		categoryModel.setDescription(categoryDTO.getDescription());
+		categoryModel.setImage(image);
 
-        return categoryPageDTO;
-    }
+		categoryModel = categoryRepository.save(categoryModel);
+		
+		//CategoryDTO ResponseCategoryDTO = constructResponse(categoryModel);
 
-    public CategoryDTO get(long id) {
-        CategoryModel categoryModel = categoryRepository.findByIdAndActive(id, true);
-        if (categoryModel == null) {
-            throw new RuntimeException("Category not found");
-        }
-        CategoryDTO categoryDTO = constructResponse(categoryModel);
+		ResponseDTO responseDTO = new ResponseDTO();
+		responseDTO.setResponseStatus("Success");
+		responseDTO.setResponseMessage(
+				categoryDTO.getId() != null && categoryDTO.getId() > 0 ? "Updated Successfully" : "Saved Successfully");
+		responseDTO.setResponse(categoryModel);
 
-        ResponseDTO response = new ResponseDTO();
-        response.setResponseStatus("Success");
-        response.setResponseMessage("Record Fetched Successfully");
-        categoryDTO.setResponse(response);
+		return responseDTO;
+	}
 
-        return categoryDTO;
-    }
+	public CategoryPageDTO list(CategoryPageDTO categoryPageDTO) {
+		Pageable paging = PageRequest.of(categoryPageDTO.getPageNumber() > 0 ? categoryPageDTO.getPageNumber() - 1 : 0,
+				categoryPageDTO.getListSize() > 0 ? categoryPageDTO.getListSize() : 25,
+				Sort.by("categoryName").ascending());
 
-    public ResponseDTO delete(long id) {
-        CategoryModel categoryModel = categoryRepository.findByIdAndActive(id, true);
-        if (categoryModel == null) {
-            throw new RuntimeException("Category not found");
-        }
-        categoryModel.setActive(false);
-        categoryRepository.save(categoryModel);
+		Page<CategoryModel> page;
+		if (categoryPageDTO.getSearchString() != null && !categoryPageDTO.getSearchString().isEmpty()) {
+			page = categoryRepository.findByCategoryNameContainsIgnoreCaseAndActive(categoryPageDTO.getSearchString(),
+					true, paging);
+		} else {
+			page = categoryRepository.findByActive(true, paging);
+		}
 
-        ResponseDTO responseDTO = new ResponseDTO();
-        responseDTO.setResponseStatus("Success");
-        responseDTO.setResponseMessage("Deleted Successfully");
-        
-        return responseDTO;
-    }
+		List<CategoryDTO> categoryDTOList = page.stream().map(this::constructResponse).collect(Collectors.toList());
 
-    private CategoryDTO constructResponse(CategoryModel categoryModel) {
-        CategoryDTO categoryDTO = new CategoryDTO();
-        categoryDTO.setId(categoryModel.getId());
-        categoryDTO.setCategoryName(categoryModel.getCategoryName());
-        categoryDTO.setDescription(categoryModel.getDescription());
-        categoryDTO.setImageUrl(categoryModel.getImageurl()); // <-- map image URL
-        return categoryDTO;
-    }
-    private String uploadToS3(MultipartFile file) {
-        try {
-            String key = "category/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+		categoryPageDTO.setCategories(categoryDTOList);
+		categoryPageDTO.setCount(page.getTotalElements());
+		categoryPageDTO.setTotalPages(page.getTotalPages());
 
-            PutObjectRequest putOb = PutObjectRequest.builder()
-                    .bucket(BUCKET)
-                    .key(key)
-                    //.acl("public-read")
-                    //.acl(ObjectCannedACL.PUBLIC_READ)
-                    .contentType(file.getContentType())
-                    .build();
+		ResponseDTO responseDTO = new ResponseDTO();
+		responseDTO.setResponseStatus("Success");
+		responseDTO.setResponseMessage("List Fetched");
+		categoryPageDTO.setResponse(responseDTO);
 
-            s3Client.putObject(putOb, software.amazon.awssdk.core.sync.RequestBody.fromBytes(file.getBytes()));
+		return categoryPageDTO;
+	}
 
-            //return "https://" + BUCKET + ".s3.amazonaws.com/" + key;
-            return "https://" + BUCKET + ".s3." + REGION + ".amazonaws.com/" + key;
+	public CategoryDTO get(long id) {
+		CategoryModel categoryModel = categoryRepository.findByIdAndActive(id, true);
+		if (categoryModel == null) {
+			throw new RuntimeException("Category not found");
+		}
+		CategoryDTO categoryDTO = constructResponse(categoryModel);
 
-        } catch (IOException e) {
-            throw new RuntimeException("Error uploading file to S3", e);
-        }
-    }
+		ResponseDTO responseDTO = new ResponseDTO();
+		responseDTO.setResponseStatus("Success");
+		responseDTO.setResponseMessage("Record Fetched Successfully");
+		//categoryDTO.setResponse(responseDTO);
+
+		return categoryDTO;
+	}
+
+	public ResponseDTO delete(long id) {
+		CategoryModel categoryModel = categoryRepository.findByIdAndActive(id, true);
+		if (categoryModel == null) {
+			throw new RuntimeException("Category not found");
+		}
+		categoryModel.setActive(false);
+		categoryRepository.save(categoryModel);
+
+		ResponseDTO responseDTO = new ResponseDTO();
+		responseDTO.setResponseStatus("Success");
+		responseDTO.setResponseMessage("Deleted Successfully");
+
+		return responseDTO;
+	}
+
+	private CategoryDTO constructResponse(CategoryModel categoryModel) {
+		CategoryDTO categoryDTO = new CategoryDTO();
+		categoryDTO.setId(categoryModel.getId());
+		categoryDTO.setCategoryName(categoryModel.getCategoryName());
+		categoryDTO.setDescription(categoryModel.getDescription());
+		categoryDTO.setActive(categoryModel.getActive());
+		if (categoryModel.getImage() != null && !categoryModel.getImage().isEmpty()) {
+			String fileName = categoryModel.getImage();
+ 
+			String preSignedFileUrl = awsUtil.getpreSignedFile(5, fileName, "category");
+			if (!preSignedFileUrl.isEmpty()) {
+				categoryDTO.setImageName(preSignedFileUrl);
+			} else {
+				logger.warn("Get Image File URL Failed " + fileName);
+			}
+		}
+		return categoryDTO;
+	}
+
 }

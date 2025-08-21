@@ -21,24 +21,30 @@ import com.paarr.service.CategoryService;
 //	        ResponseDTO response = categoryService.save(categoryDTO);
 //	        return new ResponseEntity<ResponseDTO>(response, HttpStatus.CREATED);
 //	    }
-	    @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	    public ResponseEntity<ResponseDTO> save(
-	            @RequestParam(required = false) Long id,
-	            @RequestParam String name,
-	            @RequestParam String description,
-	            @RequestParam(required = false) MultipartFile imageFile) {
-
-	       // CategoryDTO dto = new CategoryDTO(id, name, description, null, imageFile);
-	    	CategoryDTO dto = new CategoryDTO();
-	        dto.setId(id);
-	        dto.setCategoryName(name);
-	        dto.setDescription(description);
-	        dto.setImageFile(imageFile);
-
-	        ResponseDTO response = categoryService.save(dto);
-	        return new ResponseEntity<>(response, HttpStatus.CREATED);
-//	        ResponseDTO<CategoryModel> response = categoryService.save(dto);
+//	    @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//	    public ResponseEntity<ResponseDTO> save(
+//	            @RequestParam(required = false) Long id,
+//	            @RequestParam String name,
+//	            @RequestParam String description,
+//	            @RequestParam(required = false) MultipartFile imageFile) {
+//
+//	       // CategoryDTO dto = new CategoryDTO(id, name, description, null, imageFile);
+//	    	CategoryDTO dto = new CategoryDTO();
+//	        dto.setId(id);
+//	        dto.setCategoryName(name);
+//	        dto.setDescription(description);
+//	        dto.setImageFile(imageFile);
+//
+//	        ResponseDTO response = categoryService.save(dto);
 //	        return new ResponseEntity<>(response, HttpStatus.CREATED);
+////	        ResponseDTO<CategoryModel> response = categoryService.save(dto);
+////	        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//	    }
+	    @PostMapping("/save")
+	    public ResponseEntity<ResponseDTO> categorySave(@RequestBody CategoryDTO categoryDTO) {
+	        
+	        ResponseDTO responseDTO = categoryService.save(categoryDTO);
+	        return ResponseEntity.ok(responseDTO);
 	    }
 
 	    
@@ -54,7 +60,7 @@ import com.paarr.service.CategoryService;
 	        CategoryDTO categoryDTO = categoryService.get(id);
 	        return new ResponseEntity<CategoryDTO>(categoryDTO, HttpStatus.OK);
 	    }
-
+     
 	    @DeleteMapping(value = "/delete")
 	    public ResponseEntity<ResponseDTO> delete(@RequestParam long id) {
 	        ResponseDTO responseDTO = categoryService.delete(id);

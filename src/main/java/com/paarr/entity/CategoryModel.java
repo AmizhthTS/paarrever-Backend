@@ -19,9 +19,8 @@ import lombok.*;
 	    private String categoryName;
 
 	    private String description;
-	    private String imageurl;
-
-	 
+	    private String image;
+       
 	    private Boolean active;
 	}
 

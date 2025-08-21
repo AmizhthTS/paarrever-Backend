@@ -36,6 +36,11 @@ public class StoreModel {
     
     @Column(name="Closing_Time",nullable=false)
     private String ClosingTime;
+    
+    @Column(name="Map_Link",nullable=true)
+    private String mapLink;
+    
+    
     @Column(name="active", nullable=false)
     private Boolean active;
     

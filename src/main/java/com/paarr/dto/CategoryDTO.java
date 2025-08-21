@@ -1,6 +1,4 @@
 package com.paarr.dto;
-import org.springframework.web.multipart.MultipartFile;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +9,12 @@ public class CategoryDTO {
 	    private Long id;
 	    private String categoryName;
 	    private String description;
-	    private String imageUrl;
-	    private MultipartFile imageFile;
-	    private ResponseDTO response;
+	    private byte[] image;
+	    private String imageName;
+	    private String sequence;
+	    //private String imageUrl;
+	    //private ResponseDTO response;
+	    private Boolean active;
 	}
 
 

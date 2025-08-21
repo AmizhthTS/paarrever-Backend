@@ -36,6 +36,7 @@ public class StoreServiceImpl implements StoreService {
         storeModel.setContactNumber(storeDTO.getContactNumber());
         storeModel.setOpeningTime(storeDTO.getOpeningTime());
         storeModel.setClosingTime(storeDTO.getClosingTime());
+        storeModel.setMapLink(storeDTO.getMapLink());
 
         storeRepository.save(storeModel);
 
@@ -118,6 +119,7 @@ public class StoreServiceImpl implements StoreService {
         storeDTO.setContactNumber(model.getContactNumber());
         storeDTO.setOpeningTime(model.getOpeningTime());
         storeDTO.setClosingTime(model.getClosingTime());
+        storeDTO.setMapLink(model.getMapLink());
         return storeDTO;
     }
 }

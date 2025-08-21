@@ -42,8 +42,8 @@ public class AuthController {
         String token = jwtUtil.generateToken(user.getUsername());
       // return ResponseEntity.ok(Map.of(,"token", token));
         return ResponseEntity.ok(Map.of(
-                "success", "success",
-                "message", "Login successfully",
+                "Reponsestatus", "success",
+                "ResponseMessage", "Login successfully",
                 "token", token
         ));
     }

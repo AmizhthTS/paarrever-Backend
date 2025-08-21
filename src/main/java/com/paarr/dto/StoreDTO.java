@@ -23,5 +23,6 @@ public class StoreDTO {
     private String contactNumber;
     private String openingTime;
     private String closingTime;
+    private String mapLink;
     
 }

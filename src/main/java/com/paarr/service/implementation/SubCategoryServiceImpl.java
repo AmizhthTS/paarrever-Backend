@@ -67,14 +67,13 @@ import java.util.stream.Collectors;
 
 	        Page<SubCategoryModel> page;
 	        if (subCategoryPageDTO.getSearchString() != null && !subCategoryPageDTO.getSearchString().isEmpty()) {
-	            page = subCategoryRepository.findByCategoryIdAndSubCategoryNameContainsIgnoreCaseAndActive(
-	                    subCategoryPageDTO.getCategoryId(),
+	            page = subCategoryRepository.findBySubCategoryNameContainsIgnoreCaseAndActive(
 	                    subCategoryPageDTO.getSearchString(),
 	                    true,
 	                    paging
 	            );
 	        } else {
-	            page = subCategoryRepository.findByCategoryIdAndActive(subCategoryPageDTO.getCategoryId(), true, paging);
+	            page = subCategoryRepository.findByActive(true, paging);
 	        }
 
 	        List<SubCategoryDTO> subCategoryDTOList = page.stream()

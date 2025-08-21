@@ -11,6 +11,9 @@ public interface SubCategoryRepository extends JpaRepository<SubCategoryModel, L
 	    Page<SubCategoryModel> findByCategoryIdAndSubCategoryNameContainsIgnoreCaseAndActive(Long categoryId, String name, Boolean active, Pageable pageable);
 	    Page<SubCategoryModel> findByCategoryIdAndActive(Long categoryId, Boolean active, Pageable pageable);
 	    List<SubCategoryModel> findByCategoryIdAndActive(Long categoryId, Boolean active);
+		Page<SubCategoryModel> findBySubCategoryNameContainsIgnoreCaseAndActive(String searchString, boolean b,
+				Pageable paging);
+		Page<SubCategoryModel> findByActive(boolean b, Pageable paging);
 		
 	
 
