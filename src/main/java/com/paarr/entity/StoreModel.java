@@ -1,8 +1,18 @@
 package com.paarr.entity;
 
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.time.LocalTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "stores")
@@ -31,11 +41,8 @@ public class StoreModel {
     @Column(name="contact_number",nullable=false)
     private String contactNumber;
     
-    @Column(name="Opening_Time",nullable=false)
-    private String OpeningTime;
-    
-    @Column(name="Closing_Time",nullable=false)
-    private String ClosingTime;
+    private LocalTime OpeningTime;
+    private LocalTime ClosingTime;
     
     @Column(name="Map_Link",nullable=true)
     private String mapLink;

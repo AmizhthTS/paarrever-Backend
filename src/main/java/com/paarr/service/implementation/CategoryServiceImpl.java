@@ -117,17 +117,18 @@ public class CategoryServiceImpl implements CategoryService {
 			categoryModel = categoryRepository.findById(categoryDTO.getId()).orElse(new CategoryModel());
 		} else {
 			categoryModel = new CategoryModel();
-			categoryModel.setActive(true); 
-			
+			categoryModel.setActive(true);
+
 		}
 
+		categoryModel.setSequence(categoryDTO.getSequence());
 		categoryModel.setCategoryName(categoryDTO.getCategoryName());
 		categoryModel.setDescription(categoryDTO.getDescription());
 		categoryModel.setImage(image);
 
 		categoryModel = categoryRepository.save(categoryModel);
-		
-		//CategoryDTO ResponseCategoryDTO = constructResponse(categoryModel);
+
+		// CategoryDTO ResponseCategoryDTO = constructResponse(categoryModel);
 
 		ResponseDTO responseDTO = new ResponseDTO();
 		responseDTO.setResponseStatus("Success");
@@ -141,7 +142,7 @@ public class CategoryServiceImpl implements CategoryService {
 	public CategoryPageDTO list(CategoryPageDTO categoryPageDTO) {
 		Pageable paging = PageRequest.of(categoryPageDTO.getPageNumber() > 0 ? categoryPageDTO.getPageNumber() - 1 : 0,
 				categoryPageDTO.getListSize() > 0 ? categoryPageDTO.getListSize() : 25,
-				Sort.by("categoryName").ascending());
+				Sort.by("sequence").ascending());
 
 		Page<CategoryModel> page;
 		if (categoryPageDTO.getSearchString() != null && !categoryPageDTO.getSearchString().isEmpty()) {
@@ -175,7 +176,7 @@ public class CategoryServiceImpl implements CategoryService {
 		ResponseDTO responseDTO = new ResponseDTO();
 		responseDTO.setResponseStatus("Success");
 		responseDTO.setResponseMessage("Record Fetched Successfully");
-		//categoryDTO.setResponse(responseDTO);
+		// categoryDTO.setResponse(responseDTO);
 
 		return categoryDTO;
 	}
@@ -200,10 +201,11 @@ public class CategoryServiceImpl implements CategoryService {
 		categoryDTO.setId(categoryModel.getId());
 		categoryDTO.setCategoryName(categoryModel.getCategoryName());
 		categoryDTO.setDescription(categoryModel.getDescription());
+		categoryDTO.setSequence(categoryModel.getSequence());
 		categoryDTO.setActive(categoryModel.getActive());
 		if (categoryModel.getImage() != null && !categoryModel.getImage().isEmpty()) {
 			String fileName = categoryModel.getImage();
- 
+
 			String preSignedFileUrl = awsUtil.getpreSignedFile(5, fileName, "category");
 			if (!preSignedFileUrl.isEmpty()) {
 				categoryDTO.setImageName(preSignedFileUrl);

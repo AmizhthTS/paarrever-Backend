@@ -11,7 +11,7 @@ public class CategoryDTO {
 	    private String description;
 	    private byte[] image;
 	    private String imageName;
-	    private String sequence;
+	    private int sequence;
 	    //private String imageUrl;
 	    //private ResponseDTO response;
 	    private Boolean active;

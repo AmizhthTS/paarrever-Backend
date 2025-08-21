@@ -2,6 +2,8 @@ package com.paarr.dto;
 
 
 
+import java.time.LocalTime;
+
 import lombok.Data;
 
 //@Data
@@ -21,8 +23,9 @@ public class StoreDTO {
     private String mainArea;
     private String subArea;
     private String contactNumber;
-    private String openingTime;
-    private String closingTime;
+    private LocalTime openingTime;
+    private LocalTime closingTime;
     private String mapLink;
+	private String time;
     
 }
