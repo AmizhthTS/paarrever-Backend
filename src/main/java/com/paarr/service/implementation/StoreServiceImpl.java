@@ -2,6 +2,7 @@ package com.paarr.service.implementation;
 
 import com.paarr.dto.*;
 import com.paarr.entity.StoreModel;
+import com.paarr.exception.ResourceNotFoundException;
 import com.paarr.repository.StoreRepository;
 import com.paarr.service.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class StoreServiceImpl implements StoreService {
 			page = storeRepository.findByStoreNameContainsIgnoreCaseAndActive(storePageDTO.getSearchString(), true,
 					paging);
 		} else {
-			page = storeRepository.findAll(paging);
+			page = storeRepository.findByActive(true, paging); 
 		}
 
 		List<StoreDTO> storeDTOList = page.stream().map(this::mapToDTO).collect(Collectors.toList());
@@ -72,35 +73,68 @@ public class StoreServiceImpl implements StoreService {
 		storePageDTO.setTotalPages(page.getTotalPages());
 
 		ResponseDTO responseDTO = new ResponseDTO();
-		responseDTO.setResponseStatus("Success");
-		responseDTO.setResponseMessage("List Fetched");
-		storePageDTO.setResponse(responseDTO);
+//		responseDTO.setResponseStatus("Success");
+//		responseDTO.setResponseMessage("List Fetched");
+//		storePageDTO.setResponse(responseDTO);
+		 if (storeDTOList.isEmpty()) {
+		        responseDTO.setResponseStatus("Failed");
+		        responseDTO.setResponseMessage("No active stores found");
+		    } else {
+		        responseDTO.setResponseStatus("Success");
+		        responseDTO.setResponseMessage("List Fetched");
+		    }
 
 		return storePageDTO;
 	}
 
+//	@Override
+//	public StoreDTO get(long id) {
+//		StoreModel storeModel = storeRepository.findByIdAndActive(id, true);
+//		if (storeModel == null)
+//			throw new RuntimeException("Store not found");
+//		return mapToDTO(storeModel);
+//	}
 	@Override
 	public StoreDTO get(long id) {
-		StoreModel storeModel = storeRepository.findByIdAndActive(id, true);
-		if (storeModel == null)
-			throw new RuntimeException("Store not found");
-		return mapToDTO(storeModel);
+	    StoreModel storeModel = storeRepository.findByIdAndActive(id, true);
+	    if (storeModel == null) {
+	        throw new ResourceNotFoundException("Store with id " + id + " not found or inactive");
+	    }
+	    return mapToDTO(storeModel);
 	}
 
+
+//	@Override
+//	public ResponseDTO delete(long id) {
+//		StoreModel storeModel = storeRepository.findByIdAndActive(id, true);
+//		if (storeModel == null)
+//			throw new RuntimeException("Store not found");
+//
+//		storeModel.setActive(false);
+//		storeRepository.save(storeModel);
+//
+//		ResponseDTO response = new ResponseDTO();
+//		response.setResponseStatus("Success");
+//		response.setResponseMessage("Deleted Successfully");
+//		return response;
+//	}
 	@Override
 	public ResponseDTO delete(long id) {
-		StoreModel storeModel = storeRepository.findByIdAndActive(id, true);
-		if (storeModel == null)
-			throw new RuntimeException("Store not found");
+	    StoreModel storeModel = storeRepository.findByIdAndActive(id, true);
+	    if (storeModel == null) {
+	        // Covers both "doesn't exist" and "already soft-deleted (active=false)"
+	        throw new ResourceNotFoundException("Store with id " + id + " not found or already deleted");
+	    }
 
-		storeModel.setActive(false);
-		storeRepository.save(storeModel);
+	    storeModel.setActive(false);
+	    storeRepository.save(storeModel);
 
-		ResponseDTO response = new ResponseDTO();
-		response.setResponseStatus("Success");
-		response.setResponseMessage("Deleted Successfully");
-		return response;
+	    ResponseDTO response = new ResponseDTO();
+	    response.setResponseStatus("Success");
+	    response.setResponseMessage("Deleted Successfully");
+	    return response;
 	}
+
 
 	@Override
 	public List<StoreDTO> getByMainArea(String mainArea) {

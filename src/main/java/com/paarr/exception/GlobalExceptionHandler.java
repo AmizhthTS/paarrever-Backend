@@ -29,7 +29,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	private String errorReceipients;
 	@Autowired
 	private ErrorLogRepository errorLogRepository;
-
+	@ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ResponseDTO> handleResourceNotFound(ResourceNotFoundException ex) {
+        ResponseDTO dto = new ResponseDTO();
+        dto.setResponseStatus("Failed");
+        dto.setResponseMessage(ex.getMessage());
+        dto.setResponse(null);
+        dto.setErrorResponseDTO(null);
+        return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
+    }
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> Exception(Exception exception, WebRequest webRequest, HandlerMethod handler) {
 		ErrorResponseDTO errorResponse = new ErrorResponseDTO();

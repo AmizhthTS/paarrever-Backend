@@ -20,6 +20,7 @@ import lombok.*;
 
 	    private String description;
 	    private String image;
+	    @Column(name = "sequence", nullable = false, columnDefinition = "integer default 0")
 	    private int sequence;
        
 	    private Boolean active;

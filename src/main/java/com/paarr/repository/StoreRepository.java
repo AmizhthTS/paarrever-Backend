@@ -27,6 +27,8 @@ public interface StoreRepository extends JpaRepository<StoreModel, Long> {
 
 	    // ✅ Search by sub area
 	    Page<StoreModel> findBySubAreaContainsIgnoreCaseAndActive(String subArea, Boolean active, Pageable pageable);
+
+		Page<StoreModel> findByActive(boolean b, Pageable paging);
 	
 
 }
