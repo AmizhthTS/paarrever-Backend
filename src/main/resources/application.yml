@@ -21,12 +21,11 @@ spring:
     check-template-location: false
   datasource:
     driver-class-name: org.postgresql.Driver
-    username: staging
-    password: staging20252020
-    #password: Cmarf#2025
-    # url: jdbc:postgresql://cmarf.crwmo2se0f1m.ap-south-1.rds.amazonaws.com:5432/postgres?currentSchema=paarr
+    username: thalamz
+    password: thalamzprod20252020
+   
     #url: jdbc:postgresql://192.168.0.2:5432/postgres?currentSchema=paarr_dev
-    url: jdbc:postgresql://amizhthstaging.c3mo88ymk0da.ap-south-1.rds.amazonaws.com:5432/postgres?currentSchema=paarr
+    url: jdbc:postgresql://thalamz-prod.cz624s8kkocj.ap-south-1.rds.amazonaws.com:5432/thalamz?currentSchema=staging_paarrever
   jpa:
     generate-ddl: true
     hibernate:
