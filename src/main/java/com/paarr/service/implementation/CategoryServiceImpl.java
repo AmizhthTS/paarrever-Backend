@@ -145,10 +145,15 @@ public class CategoryServiceImpl implements CategoryService {
 				Sort.by("sequence").ascending());
 
 		Page<CategoryModel> page;
-		if (categoryPageDTO.getSearchString() != null && !categoryPageDTO.getSearchString().isEmpty()) {
+		if (categoryPageDTO.getSearchString() != null && !categoryPageDTO.getSearchString().isEmpty())
+		{
 			page = categoryRepository.findByCategoryNameContainsIgnoreCaseAndActive(categoryPageDTO.getSearchString(),
 					true, paging);
-		} else {
+		}
+	    if(categoryPageDTO.getCategoryId() > 0) {
+		      page = categoryRepository.findByIdAndActive(categoryPageDTO.getCategoryId(), true, paging);
+		    }
+        else {
 			page = categoryRepository.findByActive(true, paging);
 		}
 

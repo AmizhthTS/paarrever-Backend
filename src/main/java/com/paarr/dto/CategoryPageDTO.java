@@ -9,6 +9,7 @@ public class CategoryPageDTO {
 	    private String searchString;
 	    private long count;
 	    private int totalPages;
+	   private long categoryId;
 	    private List<CategoryDTO> categories;
 	    private ResponseDTO response;
 }
