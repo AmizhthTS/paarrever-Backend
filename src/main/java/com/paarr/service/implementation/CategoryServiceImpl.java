@@ -139,37 +139,79 @@ public class CategoryServiceImpl implements CategoryService {
 		return responseDTO;
 	}
 
+//	public CategoryPageDTO list(CategoryPageDTO categoryPageDTO) {
+//		Pageable paging = PageRequest.of(categoryPageDTO.getPageNumber() > 0 ? categoryPageDTO.getPageNumber() - 1 : 0,
+//				categoryPageDTO.getListSize() > 0 ? categoryPageDTO.getListSize() : 25,
+//				Sort.by("sequence").ascending());
+//
+//		Page<CategoryModel> page;
+//		if (categoryPageDTO.getSearchString() != null && !categoryPageDTO.getSearchString().isEmpty()) {
+//			page = categoryRepository.findByCategoryNameContainsIgnoreCaseAndActive(categoryPageDTO.getSearchString(),
+//					true, paging);
+//		}
+//		if (categoryPageDTO.getCategoryId() > 0) {
+//			page = categoryRepository.findByIdAndActive(categoryPageDTO.getCategoryId(), true, paging);
+//		} else {
+//			page = categoryRepository.findByActive(true, paging);
+//		}
+//
+//		List<CategoryDTO> categoryDTOList = page.stream().map(this::constructResponse).collect(Collectors.toList());
+//
+//		categoryPageDTO.setCategories(categoryDTOList);
+//		categoryPageDTO.setCount(page.getTotalElements());
+//		categoryPageDTO.setTotalPages(page.getTotalPages());
+//
+//		ResponseDTO responseDTO = new ResponseDTO();
+//		responseDTO.setResponseStatus("Success");
+//		responseDTO.setResponseMessage("List Fetched");
+//		categoryPageDTO.setResponse(responseDTO);
+//
+//		return categoryPageDTO;
+//	}
 	public CategoryPageDTO list(CategoryPageDTO categoryPageDTO) {
-		Pageable paging = PageRequest.of(categoryPageDTO.getPageNumber() > 0 ? categoryPageDTO.getPageNumber() - 1 : 0,
-				categoryPageDTO.getListSize() > 0 ? categoryPageDTO.getListSize() : 25,
-				Sort.by("sequence").ascending());
 
-		Page<CategoryModel> page;
-		if (categoryPageDTO.getSearchString() != null && !categoryPageDTO.getSearchString().isEmpty())
-		{
-			page = categoryRepository.findByCategoryNameContainsIgnoreCaseAndActive(categoryPageDTO.getSearchString(),
-					true, paging);
-		}
-	    if(categoryPageDTO.getCategoryId() > 0) {
-		      page = categoryRepository.findByIdAndActive(categoryPageDTO.getCategoryId(), true, paging);
-		    }
-        else {
-			page = categoryRepository.findByActive(true, paging);
-		}
+	    Pageable paging = PageRequest.of(
+	            Math.max(categoryPageDTO.getPageNumber() - 1, 0),
+	            categoryPageDTO.getListSize() > 0 ? categoryPageDTO.getListSize() : 25,
+	            Sort.by("sequence").ascending()
+	    );
 
-		List<CategoryDTO> categoryDTOList = page.stream().map(this::constructResponse).collect(Collectors.toList());
+	    Page<CategoryModel> page;
 
-		categoryPageDTO.setCategories(categoryDTOList);
-		categoryPageDTO.setCount(page.getTotalElements());
-		categoryPageDTO.setTotalPages(page.getTotalPages());
+	    String search = categoryPageDTO.getSearchString();
+	    boolean hasSearch = (search != null && !search.trim().isEmpty());
+	    long categoryId = categoryPageDTO.getCategoryId();
 
-		ResponseDTO responseDTO = new ResponseDTO();
-		responseDTO.setResponseStatus("Success");
-		responseDTO.setResponseMessage("List Fetched");
-		categoryPageDTO.setResponse(responseDTO);
+	    if (categoryId > 0 && hasSearch) {
+	        page = categoryRepository
+	                .findByIdAndCategoryNameContainsIgnoreCaseAndActive(categoryId, search, true, paging);
+	    } 
+	    else if (categoryId > 0) {
+	        page = categoryRepository.findByIdAndActive(categoryId, true, paging);
+	    } 
+	    else if (hasSearch) {
+	        page = categoryRepository.findByCategoryNameContainsIgnoreCaseAndActive(search, true, paging);
+	    } 
+	    else {
+	        page = categoryRepository.findByActive(true, paging);
+	    }
 
-		return categoryPageDTO;
+	    List<CategoryDTO> categoryDTOList = page.stream()
+	            .map(this::constructResponse)
+	            .collect(Collectors.toList());
+
+	    categoryPageDTO.setCategories(categoryDTOList);
+	    categoryPageDTO.setCount(page.getTotalElements());
+	    categoryPageDTO.setTotalPages(page.getTotalPages());
+
+	    ResponseDTO responseDTO = new ResponseDTO();
+	    responseDTO.setResponseStatus("Success");
+	    responseDTO.setResponseMessage("List Fetched");
+	    categoryPageDTO.setResponse(responseDTO);
+
+	    return categoryPageDTO;
 	}
+
 
 	public CategoryDTO get(long id) {
 		CategoryModel categoryModel = categoryRepository.findByIdAndActive(id, true);
@@ -218,6 +260,33 @@ public class CategoryServiceImpl implements CategoryService {
 				logger.warn("Get Image File URL Failed " + fileName);
 			}
 		}
+		return categoryDTO;
+	}
+
+	public CategoryPageDTO categoryHomeList(CategoryPageDTO categoryPageDTO) {
+
+		List<CategoryModel> categoryList = categoryRepository.findByActiveOrderBySequenceAsc(true);
+
+		List<CategoryDTO> categoryDTOList = categoryList.stream().map(this::constructCategoryResponse)
+				.collect(Collectors.toList());
+
+		categoryPageDTO.setCategories(categoryDTOList);
+		categoryPageDTO.setCount(categoryDTOList.size());
+		categoryPageDTO.setTotalPages(1); // since no pagination
+
+		ResponseDTO responseDTO = new ResponseDTO();
+		responseDTO.setResponseStatus("Success");
+		responseDTO.setResponseMessage("List Fetched");
+		categoryPageDTO.setResponse(responseDTO);
+
+		return categoryPageDTO;
+	}
+
+	private CategoryDTO constructCategoryResponse(CategoryModel categoryModel) {
+		CategoryDTO categoryDTO = new CategoryDTO();
+		categoryDTO.setId(categoryModel.getId());
+		categoryDTO.setCategoryName(categoryModel.getCategoryName());
+
 		return categoryDTO;
 	}
 

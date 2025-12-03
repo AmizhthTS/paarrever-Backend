@@ -11,6 +11,7 @@ public interface CategoryService {
 	public CategoryDTO get(long id);
 	public ResponseDTO delete(long id);
 	//public ResponseDTO<CategoryModel> save(CategoryDTO categoryDTO);
+	public CategoryPageDTO categoryHomeList(CategoryPageDTO categoryPageDTO);
 	    
 
 }

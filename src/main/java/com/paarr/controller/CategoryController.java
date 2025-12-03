@@ -1,4 +1,5 @@
 package com.paarr.controller;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -8,13 +9,13 @@ import com.paarr.dto.*;
 import com.paarr.entity.CategoryModel;
 import com.paarr.service.CategoryService;
 
-	@RestController
-	@RequestMapping(value = "/category")
-	@CrossOrigin(origins = "*")
-	public class CategoryController {
+@RestController
+@RequestMapping(value = "/category")
+@CrossOrigin(origins = "*")
+public class CategoryController {
 
-	    @Autowired
-	    CategoryService categoryService;
+	@Autowired
+	CategoryService categoryService;
 
 //	    @PostMapping(value = "/save", produces = { MediaType.APPLICATION_JSON_VALUE })
 //	    public ResponseEntity<ResponseDTO> save(@RequestBody CategoryDTO categoryDTO) {
@@ -40,32 +41,35 @@ import com.paarr.service.CategoryService;
 ////	        ResponseDTO<CategoryModel> response = categoryService.save(dto);
 ////	        return new ResponseEntity<>(response, HttpStatus.CREATED);
 //	    }
-	    @PostMapping("/save")
-	    public ResponseEntity<ResponseDTO> categorySave(@RequestBody CategoryDTO categoryDTO) {
-	        
-	        ResponseDTO responseDTO = categoryService.save(categoryDTO);
-	        return ResponseEntity.ok(responseDTO);
-	    }
+	@PostMapping("/save")
+	public ResponseEntity<ResponseDTO> categorySave(@RequestBody CategoryDTO categoryDTO) {
 
-	    
+		ResponseDTO responseDTO = categoryService.save(categoryDTO);
+		return ResponseEntity.ok(responseDTO);
+	}
 
-	    @PostMapping(value = "/list", produces = { MediaType.APPLICATION_JSON_VALUE })
-	    public ResponseEntity<CategoryPageDTO> list(@RequestBody CategoryPageDTO categoryPageDTO) {
-	        categoryPageDTO = categoryService.list(categoryPageDTO);
-	        return new ResponseEntity<CategoryPageDTO>(categoryPageDTO, HttpStatus.OK);
-	    }
+	@PostMapping(value = "/list", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<CategoryPageDTO> list(@RequestBody CategoryPageDTO categoryPageDTO) {
+		categoryPageDTO = categoryService.list(categoryPageDTO);
+		return new ResponseEntity<CategoryPageDTO>(categoryPageDTO, HttpStatus.OK);
+	}
 
-	    @GetMapping(value = "/get")
-	    public ResponseEntity<CategoryDTO> get(@RequestParam long id) {
-	        CategoryDTO categoryDTO = categoryService.get(id);
-	        return new ResponseEntity<CategoryDTO>(categoryDTO, HttpStatus.OK);
-	    }
-     
-	    @DeleteMapping(value = "/delete")
-	    public ResponseEntity<ResponseDTO> delete(@RequestParam long id) {
-	        ResponseDTO responseDTO = categoryService.delete(id);
-	        return new ResponseEntity<ResponseDTO>(responseDTO, HttpStatus.OK);
-	    }
-	
+	@PostMapping(value = "/home/list", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<CategoryPageDTO> categoryHomeList(@RequestBody CategoryPageDTO categoryPageDTO) {
+		categoryPageDTO = categoryService.categoryHomeList(categoryPageDTO);
+		return new ResponseEntity<CategoryPageDTO>(categoryPageDTO, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/get")
+	public ResponseEntity<CategoryDTO> get(@RequestParam long id) {
+		CategoryDTO categoryDTO = categoryService.get(id);
+		return new ResponseEntity<CategoryDTO>(categoryDTO, HttpStatus.OK);
+	}
+
+	@DeleteMapping(value = "/delete")
+	public ResponseEntity<ResponseDTO> delete(@RequestParam long id) {
+		ResponseDTO responseDTO = categoryService.delete(id);
+		return new ResponseEntity<ResponseDTO>(responseDTO, HttpStatus.OK);
+	}
 
 }
