@@ -9,6 +9,8 @@ public class ContactMessageDTO {
 	    private String emailAddress;
 	    private String subject;
 	    private String message;
+	    private String phoneNumber;
+	    private boolean Checkbox;
 	
 
 }

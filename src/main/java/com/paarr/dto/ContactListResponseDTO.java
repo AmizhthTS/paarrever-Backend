@@ -11,6 +11,8 @@ public class ContactListResponseDTO {
     private String emailAddress;
     private String subject;
     private String message;
+    private String phoneNumber;
+    private boolean Checkbox;
 //	    private int pageNumber;
 //	    private int listSize;
 //	    private String searchString;

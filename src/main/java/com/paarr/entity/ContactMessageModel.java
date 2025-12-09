@@ -22,6 +22,9 @@ public class ContactMessageModel {
 	    private String emailAddress;
 
 	    private String subject;
+	    
+	    private String phoneNumber;
+	    private boolean Checkbox;
 
 	    @Column(nullable = false, columnDefinition = "TEXT")
 	    private String message;

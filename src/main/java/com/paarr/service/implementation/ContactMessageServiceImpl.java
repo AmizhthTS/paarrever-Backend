@@ -34,6 +34,8 @@ public class ContactMessageServiceImpl {
 	        entity.setEmailAddress(contactMessageDTO.getEmailAddress());
 	        entity.setSubject(contactMessageDTO.getSubject());
 	        entity.setMessage(contactMessageDTO.getMessage());
+	        entity.setCheckbox(contactMessageDTO.isCheckbox());
+	        entity.setPhoneNumber(contactMessageDTO.getPhoneNumber());
 
 	        contactMessageRepository .save(entity);
 //	        return "Message saved successfully";
@@ -97,6 +99,9 @@ public class ContactMessageServiceImpl {
 	            dto.setEmailAddress(contact.getEmailAddress());
 	            dto.setSubject(contact.getSubject());
 	            dto.setMessage(contact.getMessage());
+	            dto.setPhoneNumber(contact.getPhoneNumber());
+	            dto.setCheckbox(contact.isCheckbox());
+	           
 	            return dto;
 	        }).collect(Collectors.toList());
 
