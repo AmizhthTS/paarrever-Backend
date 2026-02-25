@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 80
   servlet:
     context-path: /paarr
 
@@ -21,11 +21,11 @@ spring:
     check-template-location: false
   datasource:
     driver-class-name: org.postgresql.Driver
-    username: thalamz
-    password: thalamzprod20252020
+    username: postgres
+    password: Thamizh123
    
     #url: jdbc:postgresql://192.168.0.2:5432/postgres?currentSchema=paarr_dev
-    url: jdbc:postgresql://thalamz-prod.cz624s8kkocj.ap-south-1.rds.amazonaws.com:5432/thalamz?currentSchema=staging_paarrever
+    url: jdbc:postgresql://database-1.cf4us8uiwbce.ap-south-1.rds.amazonaws.com:5432/postgres?currentSchema=staging_paarrever
   jpa:
     generate-ddl: true
     hibernate:
@@ -86,10 +86,10 @@ logging:
 cloud:
    aws:
      credentials:
-         access-key: AKIA5NLHMI6DF4AHHWPL
-         secret-key: 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
+         access-key: AKIAS55SXV3AWQS45MQI
+         secret-key: 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
      s3:
-         bucket: paarr-dev-doc
+         bucket: paarr-devv-doc
      region:
          static: ap-south-1
      stack:
