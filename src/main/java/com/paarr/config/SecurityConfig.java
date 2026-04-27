@@ -35,7 +35,7 @@ public class SecurityConfig {
 						.requestMatchers("/auth/**").permitAll()
 
 						.requestMatchers("/category/**", "/contact/**", "/subcategory/**", "/store/**",
-								"/newsletter/**", "/category/home/list")
+								"/newsletter/**", "/category/home/list","/feedback/**")
 						.permitAll().anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
