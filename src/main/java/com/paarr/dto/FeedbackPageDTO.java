@@ -13,7 +13,9 @@ public class FeedbackPageDTO {
     private int totalPages;
 	private long feedbackId;
 	private String branchName;
+    private String feedbackType;
     private List<FeedbackDTO> feedbacks;
-    private ResponseDTO response;
+    private ResponseDTO response;  
+
 
 }

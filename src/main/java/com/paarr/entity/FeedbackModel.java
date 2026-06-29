@@ -40,6 +40,8 @@ public class FeedbackModel {
 
     @Column(name = "feedback_message",columnDefinition = "TEXT")
     private String feedbackMessage;
+    @Column(name = "feedbacktype",columnDefinition = "TEXT")
+    private String feedbacktype;
 
     private String image;
     

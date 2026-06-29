@@ -25,7 +25,7 @@ public class ContactMessageModel {
 	    
 	    private String phoneNumber;
 	    @Column(name = "checkbox")
-	    private boolean checkbox;
+	    private Boolean checkbox;
 
 	    @Column(nullable = false, columnDefinition = "TEXT")
 	    private String message;

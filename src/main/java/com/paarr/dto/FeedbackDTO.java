@@ -23,6 +23,7 @@ public class FeedbackDTO {
     private Integer serviceRating;
 
     private String feedbackMessage;
+    private String feedbackType;
 
     private byte[] image;
     private String imageName;

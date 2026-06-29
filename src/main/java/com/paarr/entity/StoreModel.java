@@ -50,6 +50,8 @@ public class StoreModel {
     
     @Column(name="active", nullable=false)
     private Boolean active;
+    @Column(name="whatsapp_number",nullable=false)
+    private String whatsappNumber;
     
     
    

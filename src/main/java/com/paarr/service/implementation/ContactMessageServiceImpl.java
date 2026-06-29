@@ -100,7 +100,7 @@ public class ContactMessageServiceImpl {
 	            dto.setSubject(contact.getSubject());
 	            dto.setMessage(contact.getMessage());
 	            dto.setPhoneNumber(contact.getPhoneNumber());
-	            dto.setCheckbox(contact.isCheckbox());
+	            dto.setCheckbox(contact.getCheckbox());
 	           
 	            return dto;
 	        }).collect(Collectors.toList());

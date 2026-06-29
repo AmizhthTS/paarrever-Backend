@@ -132,6 +132,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         feedbackModel.setLastName(feedbackDTO.getLastName());
         feedbackModel.setPhoneNumber(feedbackDTO.getPhoneNumber());
         feedbackModel.setEmail(feedbackDTO.getEmail());
+        feedbackModel.setFeedbacktype(feedbackDTO.getFeedbackType());
 
         feedbackModel.setBranchName(feedbackDTO.getBranchName());
 
@@ -176,7 +177,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         dto.setLastName(model.getLastName());
         dto.setPhoneNumber(model.getPhoneNumber());
         dto.setEmail(model.getEmail());
-
+        dto.setFeedbackType(model.getFeedbacktype());
         dto.setBranchName(model.getBranchName());
         dto.setBoughtItems(model.getBoughtItems());
 
@@ -295,7 +296,7 @@ public FeedbackPageDTO list(FeedbackPageDTO feedbackPageDTO) {
         feedbackDTO.setLastName(feedbackModel.getLastName());
         feedbackDTO.setPhoneNumber(feedbackModel.getPhoneNumber());
         feedbackDTO.setEmail(feedbackModel.getEmail());
-
+       feedbackDTO.setFeedbackType(feedbackModel.getFeedbacktype());
         feedbackDTO.setBranchName(feedbackModel.getBranchName());
 
         // LIST OF ITEMS BOUGHT
