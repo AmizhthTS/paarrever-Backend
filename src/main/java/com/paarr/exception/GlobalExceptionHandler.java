@@ -44,7 +44,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorResponseDTO errorResponse = new ErrorResponseDTO();
 		errorResponse.setErrorCode(1000);
 		errorResponse.setErrorMessage(
-				"We're sorry, but it looks like something went wrong. Please try again later or reach us at tech@startuptn.in or 155343 or +914422256789");
+				"We're sorry, but it looks like something went wrong. Please try again later ");
 		ResponseDTO response = new ResponseDTO();
 		response.setResponseStatus("Error");
 		response.setErrorResponseDTO(errorResponse);

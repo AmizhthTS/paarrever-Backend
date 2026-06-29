@@ -27,5 +27,6 @@ public class StoreDTO {
     private LocalTime closingTime;
     private String mapLink;
 	private String time;
+	private String whatsappNumber;
 	
 }

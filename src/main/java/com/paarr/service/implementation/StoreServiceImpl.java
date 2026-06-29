@@ -43,7 +43,7 @@ public class StoreServiceImpl implements StoreService {
 		storeModel.setOpeningTime(storeDTO.getOpeningTime());
 		storeModel.setClosingTime(storeDTO.getClosingTime());
 		storeModel.setMapLink(storeDTO.getMapLink());
-
+		storeModel.setWhatsappNumber(storeDTO.getWhatsappNumber());
 		storeRepository.save(storeModel);
 
 		ResponseDTO response = new ResponseDTO();
@@ -159,6 +159,7 @@ public class StoreServiceImpl implements StoreService {
 		storeDTO.setOpeningTime(model.getOpeningTime());
 		storeDTO.setClosingTime(model.getClosingTime());
 		storeDTO.setMapLink(model.getMapLink());
+		storeDTO.setWhatsappNumber(model.getWhatsappNumber());
 
 		DateTimeFormatter dft = DateTimeFormatter.ofPattern("hh:mm a");
 
